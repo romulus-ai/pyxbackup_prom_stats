@@ -77,7 +77,7 @@ def process_input(def_labels):
     # TODO: Check for real output name
     endtimestamp_rx = re.compile(r'.*finished at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 
-    runtime_error_rx = re.compile(r'.* ERROR: .*')
+    runtime_error_rx = re.compile(r'.* (ERROR:) .*')
 
     gauges["pyxbackup_success"].labels(def_labels).set(0)
 
@@ -86,6 +86,9 @@ def process_input(def_labels):
     for line in read_lines():
         if not line:  # Skip blank lines
             continue
+        if runtime_error_rx.match(line):
+            print("ERROR")
+            gauges["pyxbackup_success"].labels(def_labels).set(1)
         if starttimestamp_rx.match(line):
             result = starttimestamp_rx.search(line)
 
@@ -99,8 +102,7 @@ def process_input(def_labels):
             gauges["pyxbackup_end_time"].labels(def_labels).set(end_date_time_obj.timestamp())
             gauges["pyxbackup_duration_seconds"].labels(def_labels).set(end_date_time_obj.timestamp() - start_date_time_obj.timestamp())
             continue
-        if runtime_error_rx.match(line):
-            gauges["pyxbackup_success"].labels(def_labels).set(1)
+
 
 def read_lines():
     line = ""
