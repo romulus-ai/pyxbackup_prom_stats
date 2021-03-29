@@ -1,0 +1,5 @@
+[03/26/2021 10:33:25] INFO: Running FULL backup, started at 2021-03-26 10:33:25
+[03/26/2021 10:33:25] INFO: Running xtrabackup with command: xtrabackup --host=localhost  --no-timestamp --backup --parallel=1 --rsync --binlog-info=on --target-dir /data/ceph/pyxbackup/work/2021_03_26-10_33_25
+
+# just an example
+[03/26/2021 10:33:25] INFO: Running FULL backup, finished at 2021-03-26 10:35:25
