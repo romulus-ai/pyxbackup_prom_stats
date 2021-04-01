@@ -1,0 +1,21 @@
+### newer version (successfull full backup)
+[04/01/2021 16:00:01] ** DEBUG **: Logging to /data/ceph/pyxbackup/work/2021_04_01-16_00_01-pyxbackup.log
+[04/01/2021 16:00:01] ** DEBUG **: Log fd: 5
+[04/01/2021 16:00:01] ** DEBUG **: Checking full directory /data/ceph/pyxbackup/stor/full/2021_03_31-08_55_04
+[04/01/2021 16:00:01] ** DEBUG **: Checking full directory /data/ceph/pyxbackup/stor/full/2021_03_21-01_00_02
+[04/01/2021 16:00:01] ** DEBUG **: Checking full directory /data/ceph/pyxbackup/stor/full/2021_03_14-01_00_01
+[04/01/2021 16:00:01] ** DEBUG **: Full list: ['2021_03_31-08_55_04', '2021_03_21-01_00_02', '2021_03_14-01_00_01']
+[04/01/2021 16:00:01] ** DEBUG **: Last full: 2021_03_31-08_55_04
+[04/01/2021 16:00:01] ** DEBUG **: Weekly list: None
+[04/01/2021 16:00:01] ** DEBUG **: Monthly list: None
+[04/01/2021 16:00:01] INFO: Running INCREMENTAL backup, started at 2021-04-01 16:00:01
+[04/01/2021 16:00:02] ** DEBUG **: Found xtrabackup version 8.0.22
+[04/01/2021 16:00:02] INFO: Running xtrabackup with command: xtrabackup --host=127.0.0.1  --password=*******  --user=root  --no-timestamp --backup --incremental-basedir=/data/ceph/pyxbackup/stor/full/2021_03_31-08_55_04 --parallel=4 --rsync --binlog-info=on --target-dir /data/ceph/pyxbackup/work/2021_04_01-16_00_01
+[04/01/2021 23:02:01] INFO: Preparing full backup: /data/ceph/pyxbackup/work/P_2021_03_31-08_55_04
+[04/01/2021 23:02:01] INFO: Running prepare command: xtrabackup --prepare --use-memory=128M --apply-log-only --target-dir /data/ceph/pyxbackup/work/P_2021_03_31-08_55_04
+[04/01/2021 23:24:00] INFO: Post apply-log, copying /data/ceph/pyxbackup/work/2021_03_31-08_55_04
+[05/01/2021 09:11:42] INFO: Backup log has been moved to /data/ceph/pyxbackup/stor/full/2021_03_31-08_55_05/innobackupex-backup.log
+[05/01/2021 09:11:42] INFO: Found binary log name from log binlog.001723', position '236
+[05/01/2021 09:11:42] INFO: ERROR: An uncaught exception error has occurred!
+[05/01/2021 09:11:46] INFO: Pruning incremental backup /data/ceph/pyxbackup/stor/incr/2021_03_07-01_00_01
+[05/01/2021 09:12:30] INFO: Pruning full backup /data/ceph/pyxbackup/stor/full/2021_03_07-01_00_01

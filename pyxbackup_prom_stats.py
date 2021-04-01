@@ -82,7 +82,7 @@ def setup_metrics():
 
 # Here we analyse the Lines from STDIN
 def process_input(def_labels):
-    starttimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Running FULL backup, started at).*')
+    starttimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* INFO: Running .* (backup, started at).*')
 
     preparingtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Preparing full backup:).*')
 
