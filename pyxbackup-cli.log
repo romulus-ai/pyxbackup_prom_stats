@@ -2,5 +2,41 @@
 [03/26/2021 10:33:25] INFO: Running xtrabackup with command: xtrabackup --host=localhost  --no-timestamp --backup --parallel=1 --rsync --binlog-info=on --target-dir /data/ceph/pyxbackup/work/2021_03_26-10_33_25
 
 # just an example
+
 [03/26/2021 10:33:25] INFO: Running FULL backup, finished at 2021-03-26 10:35:25
 [03/26/2021 10:33:25] ERROR: AHH somthing went wrong
+
+
+# Errorcase
+[screen is terminating]
+7f3c8d406000-7f3c8d605000 ---p 00009000 fd:00 64214                      /usr/lib64/libpopt.so.0.0.0
+7f3c8d605000-7f3c8d606000 r--p 00008000 fd:00 64214                      /usr/lib64/libpopt.so.0.0.0
+7f3c8d606000-7f3c8d607000 rw-p 00009000 fd:00 64214                      /usr/lib64/libpopt.so.0.0.0
+7f3c8d607000-7f3c8d60e000 r-xp 00000000 fd:00 853                        /usr/lib64/libacl.so.1.1.0
+7f3c8d60e000-7f3c8d80e000 ---p 00007000 fd:00 853                        /usr/lib64/libacl.so.1.1.0
+7f3c8d80e000-7f3c8d80f000 r--p 00007000 fd:00 853                        /usr/lib64/libacl.so.1.1.0
+7f3c8d80f000-7f3c8d810000 rw-p 00008000 fd:00 853                        /usr/lib64/libacl.so.1.1.0
+7f3c8d810000-7f3c8d814000 r-xp 00000000 fd:00 64255                      /usr/lib64/libattr.so.1.1.0
+7f3c8d814000-7f3c8da13000 ---p 00004000 fd:00 64255                      /usr/lib64/libattr.so.1.1.0
+7f3c8da13000-7f3c8da14000 r--p 00003000 fd:00 64255                      /usr/lib64/libattr.so.1.1.0
+7f3c8da14000-7f3c8da15000 rw-p 00004000 fd:00 64255                      /usr/lib64/libattr.so.1.1.0
+7f3c8da15000-7f3c8da37000 r-xp 00000000 fd:00 79721                      /usr/lib64/ld-2.17.so
+7f3c8dc24000-7f3c8dc2b000 r--s 00000000 fd:00 33685232                   /usr/lib64/gconv/gconv-modules.cache
+7f3c8dc2b000-7f3c8dc2f000 rw-p 00000000 00:00 0
+7f3c8dc34000-7f3c8dc36000 rw-p 00000000 00:00 0
+7f3c8dc36000-7f3c8dc37000 r--p 00021000 fd:00 79721                      /usr/lib64/ld-2.17.so
+7f3c8dc37000-7f3c8dc38000 rw-p 00022000 fd:00 79721                      /usr/lib64/ld-2.17.so
+7f3c8dc38000-7f3c8dc39000 rw-p 00000000 00:00 0
+7fff72bbf000-7fff72be0000 rw-p 00000000 00:00 0                          [stack]
+7fff72bfa000-7fff72bfc000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+[03/29/2021 13:59:48] ERROR: An uncaught exception error has occurred!
+Traceback (most recent call last):
+  File "/data/ceph/pyxbackup/pyxbackup", line 3403, in <module>
+    run_xb_full()
+  File "/data/ceph/pyxbackup/pyxbackup", line 2150, in run_xb_full
+    run_xb()
+  File "/data/ceph/pyxbackup/pyxbackup", line 2013, in run_xb
+    _error("Command was: ", run_cmd.replace(xb_opt_mysql_pass,"*******"))
+TypeError: expected a character buffer object
+

@@ -1,0 +1,12 @@
+[03/26/2021 10:33:25] INFO: Running FULL backup, started at 2021-03-26 10:33:25
+[03/26/2021 10:33:25] INFO: Running xtrabackup with command: xtrabackup --host=localhost  --no-timestamp --backup --parallel=1 --rsync --binlog-info=on --target-dir /data/ceph/pyxbackup/work/2021_03_26-10_33_25
+
+[03/29/2021 13:59:48] ERROR: An uncaught exception error has occurred!
+Traceback (most recent call last):
+  File "/data/ceph/pyxbackup/pyxbackup", line 3403, in <module>
+    run_xb_full()
+  File "/data/ceph/pyxbackup/pyxbackup", line 2150, in run_xb_full
+    run_xb()
+  File "/data/ceph/pyxbackup/pyxbackup", line 2013, in run_xb
+    _error("Command was: ", run_cmd.replace(xb_opt_mysql_pass,"*******"))
+TypeError: expected a character buffer object

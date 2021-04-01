@@ -64,7 +64,16 @@ def setup_metrics():
         "pyxbackup_end_time", "Timestamp pyxbackup finished at", basic_labels,
         registry=registry)
     gauges["pyxbackup_duration_seconds"] = Gauge(
-        "pyxbackup_duration_seconds", "How long pyxbackup ran for", basic_labels,
+        "pyxbackup_duration_seconds", "How long pyxbackup ran until starting the pruning", basic_labels,
+        registry=registry)
+    gauges["pyxbackup_duration_preparing_seconds"] = Gauge(
+        "pyxbackup_duration_preparing_seconds", "How long pyxbackup needed for preparing the backup", basic_labels,
+        registry=registry)
+    gauges["pyxbackup_duration_pruning_seconds"] = Gauge(
+        "pyxbackup_duration_pruning_seconds", "How long pyxbackup needed for pruning the old backups", basic_labels,
+        registry=registry)
+    gauges["pyxbackup_duration_overall_seconds"] = Gauge(
+        "pyxbackup_duration_overall_seconds", "How long pyxbackup needed for the complete backup process", basic_labels,
         registry=registry)
     gauges["pyxbackup_success"] = Gauge(
         "pyxbackup_success", "Was the last run successful 0 ok 1 notok", basic_labels,
@@ -73,36 +82,71 @@ def setup_metrics():
 
 # Here we analyse the Lines from STDIN
 def process_input(def_labels):
-    starttimestamp_rx = re.compile(r'.*started at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
-    # TODO: Check for real output name
-    endtimestamp_rx = re.compile(r'.*finished at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
+    starttimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Running FULL backup, started at).*')
 
-    runtime_error_rx = re.compile(r'.* (ERROR:) .*')
+    preparingtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Preparing full backup:).*')
 
-    gauges["pyxbackup_success"].labels(def_labels).set(0)
+    endtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Cleaning up).*')
 
-    s = None
+    pruningtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Pruning).*')
+
+    runtime_error_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (ERROR:) .*')
+
     start_date_time_obj = None
+    error = False
+
+    starttimestamp = 0
+    preparingtimestamp = 0
+    endtimestamp = 0
+    pruningtimestamp = 0
+    backup_success = 0
     for line in read_lines():
         if not line:  # Skip blank lines
             continue
+        # If we found an error line, we take the timestamp of that line as endtime!
         if runtime_error_rx.match(line):
-            print("ERROR")
-            gauges["pyxbackup_success"].labels(def_labels).set(1)
+            result = runtime_error_rx.search(line)
+            end_date_time_obj = datetime.strptime(result.group(1), '%m/%d/%Y %H:%M:%S')
+
+            backup_success = 1
+            endtimestamp = end_date_time_obj.timestamp()
+            pruningtimestamp = end_date_time_obj.timestamp()
+            error = True
+            continue
         if starttimestamp_rx.match(line):
             result = starttimestamp_rx.search(line)
 
-            start_date_time_obj = datetime.strptime(result.group(1), '%Y-%m-%d %H:%M:%S')
-            gauges["pyxbackup_start_time"].labels(def_labels).set(start_date_time_obj.timestamp())
+            start_date_time_obj = datetime.strptime(result.group(1), '%m/%d/%Y %H:%M:%S')
+            starttimestamp = start_date_time_obj.timestamp()
             continue
         if endtimestamp_rx.match(line):
             result = endtimestamp_rx.search(line)
 
-            end_date_time_obj = datetime.strptime(result.group(1), '%Y-%m-%d %H:%M:%S')
-            gauges["pyxbackup_end_time"].labels(def_labels).set(end_date_time_obj.timestamp())
-            gauges["pyxbackup_duration_seconds"].labels(def_labels).set(end_date_time_obj.timestamp() - start_date_time_obj.timestamp())
+            end_date_time_obj = datetime.strptime(result.group(1), '%m/%d/%Y %H:%M:%S')
+            endtimestamp = end_date_time_obj.timestamp()
+            continue
+        if preparingtimestamp_rx.match(line):
+            result = preparingtimestamp_rx.search(line)
+
+            preparing_date_time_obj = datetime.strptime(result.group(1), '%m/%d/%Y %H:%M:%S')
+            preparingtimestamp = preparing_date_time_obj.timestamp()
+            continue
+        if pruningtimestamp_rx.match(line):
+            result = pruningtimestamp_rx.search(line)
+
+            pruning_date_time_obj = datetime.strptime(result.group(1), '%m/%d/%Y %H:%M:%S')
+            pruningtimestamp = pruning_date_time_obj.timestamp()
             continue
 
+    gauges["pyxbackup_success"].labels(def_labels).set(backup_success)
+
+    gauges["pyxbackup_start_time"].labels(def_labels).set(starttimestamp)
+    gauges["pyxbackup_end_time"].labels(def_labels).set(endtimestamp)
+
+    gauges["pyxbackup_duration_seconds"].labels(def_labels).set(endtimestamp - starttimestamp)
+    gauges["pyxbackup_duration_preparing_seconds"].labels(def_labels).set(endtimestamp - preparingtimestamp)
+    gauges["pyxbackup_duration_pruning_seconds"].labels(def_labels).set(pruningtimestamp - endtimestamp)
+    gauges["pyxbackup_duration_overall_seconds"].labels(def_labels).set(pruningtimestamp - starttimestamp)
 
 def read_lines():
     line = ""

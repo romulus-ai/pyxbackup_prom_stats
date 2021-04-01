@@ -1,0 +1,13 @@
+### newer version (successfull full backup)
+
+[03/31/2021 08:55:04] INFO: Detected source server as 13 8.0.22
+[03/31/2021 08:55:04] INFO: Running FULL backup, started at 2021-03-31 08:55:04
+[03/31/2021 08:55:04] INFO: Running xtrabackup with command: xtrabackup --host=127.0.0.1  --password=*******  --user=root  --no-timestamp --backup --parallel=4 --rsync --binlog-info=on --target-dir /data/ceph/pyxbackup/work/2021_03_31-08_55_04
+[03/31/2021 23:02:01] INFO: Preparing full backup: /data/ceph/pyxbackup/work/P_2021_03_31-08_55_04
+[03/31/2021 23:02:01] INFO: Running prepare command: xtrabackup --prepare --use-memory=128M --apply-log-only --target-dir /data/ceph/pyxbackup/work/P_2021_03_31-08_55_04
+[03/31/2021 23:24:00] INFO: Post apply-log, copying /data/ceph/pyxbackup/work/2021_03_31-08_55_04
+[04/01/2021 09:11:42] INFO: Backup log has been moved to /data/ceph/pyxbackup/stor/full/2021_03_31-08_55_04/innobackupex-backup.log
+[04/01/2021 09:11:42] INFO: Found binary log name from log binlog.001723', position '236
+[04/01/2021 09:11:42] INFO: Cleaning up /data/ceph/pyxbackup/work excluding ['innobackupex-backup.log', 'P_2021_03_31-08_55_04', 'pyxbackup.lock', '2021_03_31-08_55_04-pyxbackup.log', 'P_2021_03_21-01_00_02']
+[04/01/2021 09:11:46] INFO: Pruning incremental backup /data/ceph/pyxbackup/stor/incr/2021_03_07-01_00_01
+[04/01/2021 09:12:30] INFO: Pruning full backup /data/ceph/pyxbackup/stor/full/2021_03_07-01_00_01
