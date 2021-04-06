@@ -64,16 +64,16 @@ def setup_metrics():
         "pyxbackup_end_time", "Timestamp pyxbackup finished at", basic_labels,
         registry=registry)
     gauges["pyxbackup_duration_seconds"] = Gauge(
-        "pyxbackup_duration_seconds", "How long pyxbackup ran until starting the pruning", basic_labels,
+        "pyxbackup_duration_seconds", "How long pyxbackup ran until starting the preparing", basic_labels,
         registry=registry)
     gauges["pyxbackup_duration_preparing_seconds"] = Gauge(
         "pyxbackup_duration_preparing_seconds", "How long pyxbackup needed for preparing the backup", basic_labels,
         registry=registry)
     gauges["pyxbackup_duration_pruning_seconds"] = Gauge(
-        "pyxbackup_duration_pruning_seconds", "How long pyxbackup needed for pruning the old backups", basic_labels,
+        "pyxbackup_duration_pruning_seconds", "How long pyxbackup needed for pruning the old backups (on incremental backups it is 0)", basic_labels,
         registry=registry)
     gauges["pyxbackup_duration_overall_seconds"] = Gauge(
-        "pyxbackup_duration_overall_seconds", "How long pyxbackup needed for the complete backup process", basic_labels,
+        "pyxbackup_duration_overall_seconds", "How long pyxbackup needed for the complete backup process starting until ending", basic_labels,
         registry=registry)
     gauges["pyxbackup_success"] = Gauge(
         "pyxbackup_success", "Was the last run successful 0 ok 1 notok", basic_labels,
@@ -84,13 +84,15 @@ def setup_metrics():
 def process_input(def_labels):
     starttimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* INFO: Running .* (backup, started at).*')
 
-    preparingtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Preparing full backup:).*')
+    preparingtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Preparing .* backup:).*')
 
     endtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Cleaning up).*')
 
     pruningtimestamp_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (INFO: Pruning).*')
 
     runtime_error_rx = re.compile(r'.*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}).* (ERROR:) .*')
+
+    logline_rx = re.compile(r'.* (ERROR|INFO|DEBUG).*')
 
     start_date_time_obj = None
     error = False
@@ -102,6 +104,8 @@ def process_input(def_labels):
     backup_success = 0
     for line in read_lines():
         if not line:  # Skip blank lines
+            continue
+        if not logline_rx.match(line):
             continue
         # If we found an error line, we take the timestamp of that line as endtime!
         if runtime_error_rx.match(line):
@@ -143,10 +147,15 @@ def process_input(def_labels):
     gauges["pyxbackup_start_time"].labels(def_labels).set(starttimestamp)
     gauges["pyxbackup_end_time"].labels(def_labels).set(endtimestamp)
 
-    gauges["pyxbackup_duration_seconds"].labels(def_labels).set(endtimestamp - starttimestamp)
+    gauges["pyxbackup_duration_seconds"].labels(def_labels).set(preparingtimestamp - starttimestamp)
     gauges["pyxbackup_duration_preparing_seconds"].labels(def_labels).set(endtimestamp - preparingtimestamp)
-    gauges["pyxbackup_duration_pruning_seconds"].labels(def_labels).set(pruningtimestamp - endtimestamp)
-    gauges["pyxbackup_duration_overall_seconds"].labels(def_labels).set(pruningtimestamp - starttimestamp)
+
+    if pruningtimestamp <= 0:
+        gauges["pyxbackup_duration_pruning_seconds"].labels(def_labels).set(0)
+    else:
+        gauges["pyxbackup_duration_pruning_seconds"].labels(def_labels).set(pruningtimestamp - endtimestamp)
+
+    gauges["pyxbackup_duration_overall_seconds"].labels(def_labels).set(endtimestamp - starttimestamp)
 
 def read_lines():
     line = ""

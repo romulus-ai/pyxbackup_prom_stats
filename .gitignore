@@ -2,3 +2,4 @@ __pycache__
 build
 dist
 pyxbackup_prom_stats.spec
+*.log
